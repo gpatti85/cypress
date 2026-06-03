@@ -38,7 +38,7 @@ jobs:
 
       # Lanciamo il runner.py anziché il comando npx diretto
       - name: Run Cypress Test Suite via Python
-        run: python runner.py
+        run: python cypress/runner.py
         env:
           CYPRESS_CYPRESS_USER: ${{ github.event.inputs.cypress_user }}
           CYPRESS_CYPRESS_PASSWORD: ${{ github.event.inputs.cypress_password }}
