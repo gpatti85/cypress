@@ -5,6 +5,7 @@ import os
 # 1. Definizione della batteria di test da eseguire
 TEST_SUITE = [
     "cypress/e2e/LoginGenerica_git.cy.js",
+    "cypress/e2e/Check_campi_mandatori_git.cy.js"
     # Puoi aggiungere qui sotto tutti gli altri file .js o .ts che vuoi includere
     # "cypress/e2e/2_1_altro_test.cy.js",
     # "cypress/e2e/3_4_gestione_carrello.cy.js",
