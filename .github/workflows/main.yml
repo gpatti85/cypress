@@ -23,20 +23,23 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Configura Node.js (necessario per Cypress)
+      # 2. Configura Node.js (indicando dove trovare il file di lock per la cache)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
+          cache-dependency-path: 'cypress/package-lock.json' # Spiega a GitHub dove cercare il lock file
 
-      # 3. Installa le dipendenze (Cypress e altri pacchetti)
+      # 3. Installa le dipendenze spostandosi nella sottocartella corretta
       - name: Install Dependencies
         run: npm ci
+        working-directory: ./cypress # Dice a GitHub di eseguire il comando dentro la cartella cypress
 
       # 4. Esecuzione dei test passando gli input come variabili d'ambiente di Cypress
       - name: Run Cypress Tests
         run: npx cypress run
+        working-directory: ./cypress # Dice a Cypress di partire dalla cartella corretta
         env:
           # GitHub Actions mappa gli input inseriti dall'utente e li passa a Cypress
           CYPRESS_CYPRESS_USER: ${{ github.event.inputs.cypress_user }}
