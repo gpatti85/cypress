@@ -1,0 +1,43 @@
+name: Run Cypress Tests Manually
+
+# Trigger per abilitare l'esecuzione manuale con inserimento dati
+on:
+  workflow_dispatch:
+    inputs:
+      cypress_user:
+        description: 'Inserisci lo username per SauceDemo'
+        required: true
+        default: 'standard_user'
+        type: string
+      cypress_password:
+        description: 'Inserisci la password per SauceDemo'
+        required: true
+        default: 'secret_sauce'
+        type: string
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Scarica il codice del progetto nella macchina virtuale
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Configura Node.js (necessario per Cypress)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      # 3. Installa le dipendenze (Cypress e altri pacchetti)
+      - name: Install Dependencies
+        run: npm ci
+
+      # 4. Esecuzione dei test passando gli input come variabili d'ambiente di Cypress
+      - name: Run Cypress Tests
+        run: npx cypress run
+        env:
+          # GitHub Actions mappa gli input inseriti dall'utente e li passa a Cypress
+          CYPRESS_CYPRESS_USER: ${{ github.event.inputs.cypress_user }}
+          CYPRESS_CYPRESS_PASSWORD: ${{ github.event.inputs.cypress_password }}
