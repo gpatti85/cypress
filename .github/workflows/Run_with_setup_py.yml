@@ -1,0 +1,54 @@
+name: Run Cypress Tests Manually
+
+on:
+  workflow_dispatch:
+    inputs:
+      cypress_user:
+        description: 'Inserisci lo username per SauceDemo'
+        required: true
+        default: 'standard_user'
+        type: string
+      cypress_password:
+        description: 'Inserisci la password per SauceDemo'
+        required: true
+        default: 'secret_sauce'
+        type: string
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16
+
+      # Configura Python sull'agente GitHub (le macchine ubuntu hanno già python, ma questo garantisce la versione corretta)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # Lanciamo il runner.py anziché il comando npx diretto
+      - name: Run Cypress Test Suite via Python
+        run: python runner.py
+        env:
+          CYPRESS_CYPRESS_USER: ${{ github.event.inputs.cypress_user }}
+          CYPRESS_CYPRESS_PASSWORD: ${{ github.event.inputs.cypress_password }}
+
+      # I video e gli screenshot verranno comunque salvati tutti nella cartella dei risultati
+      - name: Upload Cypress Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-results
+          path: |
+            cypress/screenshots/
+            cypress/videos/
