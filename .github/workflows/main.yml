@@ -18,38 +18,34 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     
-    # Definiamo la cartella di lavoro corretta per TUTTI i comandi successivi
-    defaults:
-      run:
-        working-directory: './[]Cypress'
-
     steps:
+      # 1. Scarica il codice della repository direttamente nella cartella principale
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Usiamo Node 16 per evitare il crash del flag --loader/--import di tsx
+      # 2. Configura Node 16 (stabile per questa struttura)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 16
-          cache: 'npm'
-          cache-dependency-path: './[]Cypress/package-lock.json'
 
+      # 3. Installa i pacchetti partendo dalla radice della repository
       - name: Install Dependencies
         run: npm ci
 
+      # 4. Lancia il file di test specifico che si trova in cypress/e2e
       - name: Run Cypress Tests
         run: npx cypress run --spec "cypress/e2e/1_6_login_visual_user_checkout-step-two.cy.js"
         env:
           CYPRESS_CYPRESS_USER: ${{ github.event.inputs.cypress_user }}
           CYPRESS_CYPRESS_PASSWORD: ${{ github.event.inputs.cypress_password }}
 
-      # Salviamo i video così potrai scaricarli e vederli visivamente
+      # 5. Salva i video dell'esecuzione così potrai scaricarli a fine run
       - name: Upload Cypress Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cypress-results
           path: |
-            ./[]Cypress/cypress/screenshots
-            ./[]Cypress/cypress/videos
+            cypress/screenshots/
+            cypress/videos/
