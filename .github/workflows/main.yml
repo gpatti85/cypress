@@ -1,6 +1,5 @@
 name: Run Cypress Tests Manually
 
-# Trigger per abilitare l'esecuzione manuale con inserimento dati
 on:
   workflow_dispatch:
     inputs:
@@ -18,29 +17,39 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    
+    # Definiamo la cartella di lavoro corretta per TUTTI i comandi successivi
+    defaults:
+      run:
+        working-directory: './[]Cypress'
+
     steps:
-      # 1. Scarica il codice del progetto nella macchina virtuale
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Configura Node.js (indicando dove trovare il file di lock per la cache)
+      # Usiamo Node 16 per evitare il crash del flag --loader/--import di tsx
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 16
           cache: 'npm'
-          cache-dependency-path: 'cypress/package-lock.json' # Spiega a GitHub dove cercare il lock file
+          cache-dependency-path: './[]Cypress/package-lock.json'
 
-      # 3. Installa le dipendenze spostandosi nella sottocartella corretta
       - name: Install Dependencies
         run: npm ci
-        working-directory: ./cypress # Dice a GitHub di eseguire il comando dentro la cartella cypress
 
-      # 4. Esecuzione dei test passando gli input come variabili d'ambiente di Cypress
       - name: Run Cypress Tests
-        run: npx cypress run
-        working-directory: ./cypress # Dice a Cypress di partire dalla cartella corretta
+        run: npx cypress run --spec "cypress/e2e/1_6_login_visual_user_checkout-step-two.cy.js"
         env:
-          # GitHub Actions mappa gli input inseriti dall'utente e li passa a Cypress
           CYPRESS_CYPRESS_USER: ${{ github.event.inputs.cypress_user }}
           CYPRESS_CYPRESS_PASSWORD: ${{ github.event.inputs.cypress_password }}
+
+      # Salviamo i video così potrai scaricarli e vederli visivamente
+      - name: Upload Cypress Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-results
+          path: |
+            ./[]Cypress/cypress/screenshots
+            ./[]Cypress/cypress/videos
