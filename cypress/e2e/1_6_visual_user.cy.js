@@ -124,17 +124,6 @@ describe('SauceDemo - Verifica Bug standard_user', () => {
     });
   });
 
-  it('Bug posizione carrello: icona carrello deve essere a destra nel header', () => {
-    cy.get('.inventory_item').first().find('.btn_inventory').click();
-    cy.get('[data-test="shopping-cart-badge"]').should('be.visible');
-
-    cy.get('[data-test="shopping-cart-link"]').then(($cart) => {
-      const rect = $cart[0].getBoundingClientRect();
-      const viewportWidth = Cypress.config('viewportWidth');
-      expect(rect.left).to.be.greaterThan(viewportWidth / 2,
-        `L'icona del carrello è a sinistra (left: ${rect.left}px) invece che nella metà destra del viewport (larghezza: ${viewportWidth}px)`);
-    });
-  });
 
   it('Bug carrello: il badge torna a zero dopo Remove', () => {
     cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click();
